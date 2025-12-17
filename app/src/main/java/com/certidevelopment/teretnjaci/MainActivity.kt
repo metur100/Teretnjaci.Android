@@ -7,7 +7,9 @@ import android.webkit.WebViewClient
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.setContent
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.*
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.viewinterop.AndroidView
 import com.certidevelopment.teretnjaci.ui.theme.TeretnjaciTheme
 
@@ -29,6 +31,7 @@ fun WebViewScreen() {
     var webView: WebView? by remember { mutableStateOf(null) }
 
     AndroidView(
+        modifier = Modifier.fillMaxSize(), // CRITICAL: Force full screen
         factory = { context ->
             WebView(context).apply {
                 webView = this
@@ -39,16 +42,46 @@ fun WebViewScreen() {
                 settings.loadWithOverviewMode = true
                 settings.cacheMode = WebSettings.LOAD_DEFAULT
 
-                webViewClient = WebViewClient()
+                // Force proper layout
+                settings.layoutAlgorithm = WebSettings.LayoutAlgorithm.TEXT_AUTOSIZING
+                setLayerType(WebView.LAYER_TYPE_HARDWARE, null)
 
-                // 🔗 YOUR REACT APP URL
+                // Disable zoom
+                settings.setSupportZoom(false)
+                settings.builtInZoomControls = false
+                settings.displayZoomControls = false
+
+                // CRITICAL: Force WebView to calculate height properly
+                settings.useWideViewPort = true
+                settings.loadWithOverviewMode = true
+
+                addJavascriptInterface(WebAppInterface(context), "Android")
+                webViewClient = MyWebViewClient()
+
+                //loadUrl("http://169.254.123.185:5173/")
                 loadUrl("https://teretnjaci.pages.dev/")
             }
         }
     )
 
-    // 🔙 Android back button → Web history
-    BackHandler(enabled = webView?.canGoBack() == true) {
-        webView?.goBack()
+    BackHandler {
+        webView?.let { wv ->
+            if (wv.canGoBack()) {
+                wv.goBack()
+            } else {
+                wv.evaluateJavascript("""
+                if (window.history.length > 1) {
+                    window.history.back();
+                    true;
+                } else {
+                    false;
+                }
+            """.trimIndent()) { result ->
+                    if (result == "false") {
+                        // Handle app exit or minimize
+                    }
+                }
+            }
+        }
     }
 }
