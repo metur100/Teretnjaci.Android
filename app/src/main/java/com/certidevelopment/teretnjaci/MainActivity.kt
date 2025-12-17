@@ -57,8 +57,8 @@ fun WebViewScreen() {
                 addJavascriptInterface(WebAppInterface(context), "Android")
                 webViewClient = MyWebViewClient()
 
-                loadUrl("http://169.254.123.185:5173/")
-                //loadUrl("https://teretnjaci.pages.dev/")
+                //loadUrl("http://169.254.123.185:5173/")
+                loadUrl("https://teretnjaci.pages.dev/")
             }
         }
     )
