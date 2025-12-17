@@ -3,7 +3,6 @@ package com.certidevelopment.teretnjaci
 import android.os.Bundle
 import android.webkit.WebSettings
 import android.webkit.WebView
-import android.webkit.WebViewClient
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.setContent
@@ -58,8 +57,8 @@ fun WebViewScreen() {
                 addJavascriptInterface(WebAppInterface(context), "Android")
                 webViewClient = MyWebViewClient()
 
-                //loadUrl("http://169.254.123.185:5173/")
-                loadUrl("https://teretnjaci.pages.dev/")
+                loadUrl("http://169.254.123.185:5173/")
+                //loadUrl("https://teretnjaci.pages.dev/")
             }
         }
     )
